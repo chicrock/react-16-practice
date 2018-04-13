@@ -45,3 +45,7 @@ render() {
 ```
 
 *   Remove Fragment tag when rendering.
+
+## Portals
+
+*   Portals can touch element that exists outside of the root element.
