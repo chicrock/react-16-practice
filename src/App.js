@@ -1,6 +1,31 @@
 import React, { Component, Fragment } from "react";
 import { createPortal } from "react-dom";
 
+const Message = () => "Just touched it!";
+
+const ErrorFallback = () => " Sorry something went wrong";
+
+const BoundaryHOC = (ProtectedComponent) =>
+    class BoundaryHOC extends Component {
+        state = {
+            hasError: false,
+        };
+        componentDidCatch = () => {
+            this.setState({
+                hasError: true,
+            });
+        };
+        render() {
+            const { hasError } = this.state;
+
+            if (hasError) {
+                return <ErrorFallback />;
+            } else {
+                return <ProtectedComponent />;
+            }
+        }
+    };
+
 class ErrorMaker extends Component {
     state = {
         friends: ["jisu", "flynn", "dall", "kneeprayer"],
@@ -19,36 +44,24 @@ class ErrorMaker extends Component {
     }
 }
 
+const PErrorMaker = BoundaryHOC(ErrorMaker);
+
 class Portals extends Component {
     render() {
         return createPortal(<Message />, document.getElementById("touchme"));
     }
 }
 
-const Message = () => "Just touched it!";
-
-const ErrorFallback = () => " Sorry something went wrong";
+const PPortals = BoundaryHOC(Portals);
 
 /// Imposible return list of element in component without fragment.
 class ReturnTypes extends Component {
-    state = {
-        hasError: false,
-    };
-    componentDidCatch = (error, info) => {
-        console.log(
-            `catched ${error} the info i have is ${JSON.stringify(info)}`
-        );
-        this.setState({
-            hasError: true,
-        });
-    };
     render() {
-        const { hasError } = this.state;
         return (
             <Fragment>
                 <ReturnString />
-                <Portals />
-                {hasError ? <ErrorFallback /> : <ErrorMaker />}
+                <PPortals />
+                <PErrorMaker />
             </Fragment>
         );
     }
@@ -66,4 +79,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default BoundaryHOC(App);
