@@ -4,9 +4,14 @@ const MAX_PIZZAS = 20;
 
 const eatPizza = (state, props) => {
   const { pizzas } = state;
-  return {
-    pizzas: pizzas + 1,
-  };
+
+  if (pizzas < MAX_PIZZAS) {
+    return {
+      pizzas: pizzas + 1,
+    };
+  } else {
+    return null;
+  }
 };
 
 class Controlled extends Component {
